@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library - Check Book Submission</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      width: 80%;
+      max-width: 700px;
+      background: #fff;
+      margin: 30px;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #34495e;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    input:focus {
+      border-color: #2980b9;
+      outline: none;
+    }
+    .btn {
+      background: #2980b9;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn:hover {
+      background: #1e6091;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #2980b9;
+      color: white;
+    }
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: bold;
+      color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+    <div class="container">
+      <h2>📖 Check Book Submission</h2>
+  
+      <!-- Search Form -->
+      <div class="form-group">
+        <label for="bookId">Enter Book ID</label>
+        <input type="text" id="bookId" placeholder="Enter Book ID">
+      </div>
+      <button class="btn" onclick="checkBook()">Search</button>
+  
+      <!-- Result Area -->
+      <div id="result"></div>
+    </div>
+  
+    <script>
+      // Example data: BookID -> Students who did not submit
+      const notSubmittedData = {
+        "B101": [
+          { roll: "101", name: "Amit Kumar" },
+          { roll: "102", name: "Sneha Sharma" }
+        ],
+        "B102": [
+          { roll: "103", name: "Rahul Roy" }
+        ],
+        "B103": [] // all submitted
+      };
+  
+      function checkBook() {
+        const bookId = document.getElementById("bookId").value.trim().toUpperCase();
+        const resultDiv = document.getElementById("result");
+  
+        if (!bookId) {
+          resultDiv.innerHTML = `<p class="message">⚠ Please enter a Book ID</p>`;
+          return;
+        }
+  
+        if (!(bookId in notSubmittedData)) {
+          resultDiv.innerHTML = `<p class="message">❌ Book ID not found in records</p>`;
+          return;
+        }
+  
+        const students = notSubmittedData[bookId];
+        if (students.length === 0) {
+          resultDiv.innerHTML = `<p class="message">✅ All students have submitted Book ${bookId}</p>`;
+        } else {
+          let tableHTML = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Roll No</th>
+                  <th>Student Name</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+          students.forEach(s => {
+            tableHTML += `<tr><td>${s.roll}</td><td>${s.name}</td></tr>`;
+          });
+          tableHTML += `</tbody></table>`;
+          resultDiv.innerHTML = tableHTML;
+        }
+      }
+    </script>
+  </body>
+</html>

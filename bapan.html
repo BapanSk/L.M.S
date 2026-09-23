@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Login - BCET Library</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #dfe8df;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: #ecf1f0;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      width: 350px;
+      text-align: center;
+    }
+    .login-container h2 {margin-bottom: 15px;font-size: 24px;color: #333;}
+    .login-container p {margin-bottom: 20px;font-size: 14px;color: #777;}
+    .login-container input {
+      width: 100%;padding: 12px;margin-bottom: 5px;
+      border: 1px solid #ccc;border-radius: 8px;font-size: 14px;
+    }
+    .login-container button {
+      width: 100%;padding: 12px;background: #3f51b5;
+      border: none;border-radius: 8px;color: #fff;
+      font-size: 16px;cursor: pointer;transition: background 0.3s;
+      margin-top: 10px;
+    }
+    .login-container button:hover {background: #303f9f;}
+    .login-container a {
+      display: block;margin-top: 15px;font-size: 14px;
+      text-decoration: none;color: #3f51b5;
+    }
+    .login-container a:hover {text-decoration: underline;}
+    .error {
+      color: red;
+      font-size: 13px;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    .form-group {text-align: left; margin-bottom: 10px;}
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Student Login</h2>
+    <p>Enter your credentials to access your library account.</p>
+    
+    <form onsubmit="login(event)">
+      <div class="form-group">
+        <input type="text" id="studentId" placeholder="Student ID (e.g., S12345)">
+        <div id="idError" class="error"></div>
+      </div>
+
+      <div class="form-group">
+        <input type="password" id="password" placeholder="Password">
+        <div id="passError" class="error"></div>
+      </div>
+
+      <button type="submit">Login</button>
+      <div id="generalError" class="error" style="text-align:center;"></div>
+    </form>
+
+    <a href="forgetpass.html">Forget Password</a>
+    <a href="Student Registration Page.html">Don’t have an account? Sign Up</a>
+  </div>
+
+  <script>
+    function login(event) {
+      event.preventDefault(); // stop form submission
+      
+      const id = document.getElementById("studentId").value.trim();
+      const pass = document.getElementById("password").value.trim();
+
+      const idError = document.getElementById("idError");
+      const passError = document.getElementById("passError");
+      const generalError = document.getElementById("generalError");
+
+      // clear old messages
+      idError.textContent = "";
+      passError.textContent = "";
+      generalError.textContent = "";
+
+      let valid = true;
+
+      if (id === "" && pass === "") {
+        generalError.textContent = "⚠ Student ID and Password are required!";
+        valid = false;
+      } else {
+        if (id === "") {
+          idError.textContent = "⚠ Please enter Student ID";
+          valid = false;
+        }
+        if (pass === "") {
+          passError.textContent = "⚠ Please enter Password";
+          valid = false;
+        }
+      }
+
+      if (valid) {
+        localStorage.setItem("studentId", id);
+        localStorage.setItem("password", pass);
+        window.location.href = "student_profile.html";
+      }
+    }
+  </script>
+</body>
+</html>

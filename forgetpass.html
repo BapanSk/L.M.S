@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reset Password - BCET Library</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #dfe8df;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .registration-form {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            background-color: #4c4eaf;
+            border: none;
+            color: white;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        input[type="submit"]:hover {
+            background-color: #7e96d4;
+        }
+        .error {
+            color: red;
+            font-size: 13px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-form">
+        <h2>Reset Password</h2>
+        <form onsubmit="return validateForm()">
+            <input type="text" id="college_id" placeholder="College ID">
+            <div id="collegeIdError" class="error"></div>
+
+            <input type="password" id="new_password" placeholder="New Password">
+            <div id="newPasswordError" class="error"></div>
+
+            <input type="password" id="confirm_password" placeholder="Confirm Password">
+            <div id="confirmPasswordError" class="error"></div>
+
+            <input type="submit" value="Continue">
+            <div id="formError" class="error"></div>
+        </form>
+    </div>
+
+    <script>
+        function validateForm() {
+            // Clear old errors
+            document.getElementById("collegeIdError").innerText = "";
+            document.getElementById("newPasswordError").innerText = "";
+            document.getElementById("confirmPasswordError").innerText = "";
+            document.getElementById("formError").innerText = "";
+
+            let collegeId = document.getElementById("college_id").value.trim();
+            let newPassword = document.getElementById("new_password").value.trim();
+            let confirmPassword = document.getElementById("confirm_password").value.trim();
+            let valid = true;
+
+            if (collegeId === "") {
+                document.getElementById("collegeIdError").innerText = "College ID is required!";
+                valid = false;
+            }
+            if (newPassword === "") {
+                document.getElementById("newPasswordError").innerText = "New Password is required!";
+                valid = false;
+            }
+            if (confirmPassword === "") {
+                document.getElementById("confirmPasswordError").innerText = "Confirm Password is required!";
+                valid = false;
+            }
+            if (newPassword !== "" && confirmPassword !== "" && newPassword !== confirmPassword) {
+                document.getElementById("confirmPasswordError").innerText = "Passwords do not match!";
+                valid = false;
+            }
+
+            if (!valid) {
+                document.getElementById("formError").innerText = "⚠️ Please fix the errors above.";
+                return false;
+            }
+
+            // If all ok
+            alert("✅ Password reset successful!");
+            window.location.href = "Library_management_ststem.html";
+            return false;
+        }
+    </script>
+</body>
+</html>

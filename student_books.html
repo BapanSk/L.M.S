@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BCET Library – Books & Overdues</title>
+  <link rel="stylesheet" href="books.css" />
+  <style>
+    #py {
+      margin: 20px 40px;
+      text-align: right;
+    }
+    #py button {
+      background: #1cc88a;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #py button:hover {
+      background: #17a673;
+    }
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background: #6272c8;
+      color: white;
+      font-size: 14px;
+      margin-top: 40px;
+    }
+    .filters button {
+      background: #4e73df;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">BCET Library – Books</div>
+    <nav>
+      <a href="Library_management_ststem.html">Home</a>
+      <a href="student_profile.html">Profile</a>
+    </nav>
+    
+  </header>
+  <br>
+  <div id="py" >
+    <button onclick="location.href='payment.html'">Payment</button>
+  </div>
+
+  <main class="container">
+    Available Books
+    <section class="card">
+      <h2>Available Books</h2>
+
+      <div class="filters">
+        <input id="searchInput" type="text" placeholder="Search by title or author...">
+        <select id="availabilityFilter">
+          <option value="all">All</option>
+          <option value="available">Available</option>
+          <option value="notavailable">Not Available</option>
+        </select>
+        <button id="resetBtn" type="button">Reset</button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="booksTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Book ID</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Department</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>filled by JS</tbody>
+        </table>
+      </div>
+    </section>
+
+    Previous Semester Overdues
+    <section class="card">
+      <h2>Previous Semester – Not Submitted (Overdue)</h2>
+      <p class="muted">Below is the list of students of the previous semester who did not submit the books within the stipulated time.</p>
+
+      <div class="table-wrap">
+        <table id="overdueTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Student Name</th>
+              <th>Student ID</th>
+              <th>Dept</th>
+              <th>Sem</th>
+              <th>Book ID</th>
+              <th>Title</th>
+              <th>Due Date</th>
+              <th>Days Overdue</th>
+            </tr>
+          </thead>
+          <tbody>filled by JS</tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    © 2025 Bengal College of Engineering and Technology. All Rights Reserved.
+  </footer>
+
+  <script src="books.js"></script>
+</body>
+</html>

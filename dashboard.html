@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #dfe8df;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 350px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .option {
+      display: block;
+      margin: 12px 0;
+      padding: 12px;
+      background: #4a69bd;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 18px;
+      transition: background 0.3s;
+    }
+    .option:hover {
+      background: #1e3799;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Dashboard</h2>
+    <a class="option"onclick="location.href='checkingpayment.html'">🔍Checking Payment</a>
+    <a href="payment.html" class="option"onclick="location.href='payment.html'">💳 Payment</a>
+    <a href="books.html" class="option"onclick="location.href='books.html'">📚 Add / Remove Books</a>
+    <a href="check.html" class="option"onclick="location.href='check.html'">🔍 Check with ID</a>
+    <a href="faculty.html" class="option"onclick="location.href='faculty.html'">📚 faculty</a>
+  </div>
+</body>
+</html> 

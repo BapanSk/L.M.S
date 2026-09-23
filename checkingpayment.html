@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Library Payment Checker</title>
+  <style>
+    :root{
+      --bg: #f4f8fb;
+      --card:#ffffff;
+      --accent:#2563eb;
+      --muted:#6b7280;
+      --success:#16a34a;
+      --danger:#dc2626;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    body{margin:0;background:var(--bg);padding:24px}
+    .container{max-width:1100px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size:20px;margin:0}
+    .card{background:var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(30,41,59,0.06);padding:18px}
+
+    .controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+    .controls input[type=text], .controls select{padding:10px;border-radius:8px;border:1px solid #e6eef8;min-width:220px}
+    .controls button{background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 10px;text-align:left;border-bottom:1px solid #eef3fb;font-size:14px}
+    th{color:var(--muted);font-weight:600}
+    .status{padding:6px 10px;border-radius:999px;font-weight:600;font-size:13px}
+    .paid{background:rgba(20,184,166,0.12);color:var(--success)}
+    .unpaid{background:rgba(220,38,38,0.08);color:var(--danger)}
+
+    .actions button{margin-right:8px;padding:6px 8px;border-radius:8px;border:1px solid #e6eef8;background:#fff;cursor:pointer}
+
+    .empty{padding:28px;text-align:center;color:var(--muted)}
+
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:none;align-items:center;justify-content:center}
+    .modal{background:var(--card);padding:18px;border-radius:12px;max-width:520px;width:100%}
+    .modal h3{margin-top:0}
+    .form-row{display:flex;gap:10px;margin-bottom:10px}
+    .form-row input{flex:1;padding:10px;border-radius:8px;border:1px solid #e6eef8}
+
+    .toolbar{display:flex;gap:8px;align-items:center}
+
+    @media (max-width:700px){
+      .controls input[type=text], .controls select{min-width:120px}
+      th:nth-child(4), td:nth-child(4){display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Library Payment Checker</h1>
+      <div class="toolbar">
+        <button id="downloadCsv">Export CSV</button>
+        <button id="clearStorage" title="Remove sample data and reset">Reset</button>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="controls">
+        <input id="search" type="text" placeholder="Search by name, member ID, or book title" />
+        <select id="filterStatus">
+          <option value="all">All statuses</option>
+          <option value="paid">Paid</option>
+          <option value="unpaid">Unpaid</option>
+        </select>
+        <select id="perPage">
+          <option value="10">10 per page</option>
+          <option value="25">25 per page</option>
+          <option value="50">50 per page</option>
+        </select>
+        <button id="newPayment">Record Payment</button>
+      </div>
+
+      <div id="tableWrap" style="overflow:auto">
+        <table id="paymentsTable">
+          <thead>
+            <tr>
+              <th>Member ID</th>
+              <th>Name</th>
+              <th>Amount (₹)</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+          </tbody>
+        </table>
+      </div>
+
+      <div id="pager" style="margin-top:12px;display:flex;gap:8px;align-items:center"></div>
+    </div>
+  </div>
+
+  <!-- modal -->
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div class="modal card">
+      <h3 id="modalTitle">Record Payment</h3>
+      <div>
+        <div class="form-row">
+          <input id="mMemberId" placeholder="Member ID" />
+          <input id="mName" placeholder="Member Name" />
+        </div>
+        <div class="form-row">
+          <input id="mAmount" type="number" placeholder="Amount (₹)" />
+          <input id="mDueDate" type="date" />
+        </div>
+        <div class="form-row">
+          <input id="mNotes" placeholder="Notes (optional)" />
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
+          <button id="cancelModal">Cancel</button>
+          <button id="saveModal">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple single-file demo for checking & recording payments.
+    const STORAGE_KEY = 'library_payments_v1';
+
+    // Sample data - will be saved to localStorage on first load
+    const SAMPLE = [
+      {id:'M001', name:'Asha Roy', amount:150, due:'2025-08-15', status:'unpaid', notes:'Late return - 3 days'},
+      {id:'M002', name:'Ravi Kumar', amount:0, due:'2025-07-10', status:'paid', notes:'Paid on 2025-07-11'},
+      {id:'M003', name:'Sonia Singh', amount:200, due:'2025-09-01', status:'unpaid', notes:''},
+      {id:'M004', name:'Nikhil Das', amount:50, due:'2025-06-20', status:'paid', notes:'Receipt #2231'},
+    ];
+
+    // State
+    let payments = [];
+    let page = 1;
+    let perPage = 10;
+
+    // DOM
+    const tbody = document.getElementById('tbody');
+    const search = document.getElementById('search');
+    const filterStatus = document.getElementById('filterStatus');
+    const perPageSelect = document.getElementById('perPage');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+
+    function load() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw){
+        payments = SAMPLE.slice();
+        save();
+      } else {
+        payments = JSON.parse(raw);
+      }
+    }
+    function save(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payments));
+    }
+
+    function render(){
+      perPage = Number(perPageSelect.value);
+      const q = search.value.trim().toLowerCase();
+      const status = filterStatus.value;
+
+      let filtered = payments.filter(p=>{
+        if(status!=='all' && p.status!==status) return false;
+        if(!q) return true;
+        return p.id.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) || (p.notes||'').toLowerCase().includes(q);
+      });
+
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total/perPage));
+      if(page>totalPages) page = totalPages;
+      const start = (page-1)*perPage;
+      const pageSlice = filtered.slice(start, start+perPage);
+
+      tbody.innerHTML = '';
+      if(pageSlice.length===0){
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">No records found.</td></tr>';
+      } else {
+        for(const p of pageSlice){
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${p.id}</td>
+            <td>${p.name}</td>
+            <td>${p.amount}</td>
+            <td>${p.due || ''}</td>
+            <td><span class="status ${p.status==='paid'? 'paid': 'unpaid'}">${p.status.toUpperCase()}</span></td>
+            <td>${p.notes || ''}</td>
+            <td class="actions">
+              <button class="togglePay">${p.status==='paid'?'Mark Unpaid':'Mark Paid'}</button>
+              <button class="edit">Edit</button>
+              <button class="delete">Delete</button>
+            </td>
+          `;
+          // action listeners
+          tr.querySelector('.togglePay').addEventListener('click', ()=>{
+            p.status = p.status==='paid' ? 'unpaid' : 'paid';
+            if(p.status==='paid') p.amount = 0; // example behaviour
+            save(); render();
+          });
+          tr.querySelector('.edit').addEventListener('click', ()=>openModal(p));
+          tr.querySelector('.delete').addEventListener('click', ()=>{
+            if(confirm('Delete this record?')){
+              payments = payments.filter(x=>x!==p); save(); render();
+            }
+          });
+
+          tbody.appendChild(tr);
+        }
+      }
+
+      renderPager(totalPages);
+    }
+
+    function renderPager(totalPages){
+      const pager = document.getElementById('pager');
+      pager.innerHTML = '';
+      const info = document.createElement('div');
+      info.textContent = `Page ${page} of ${totalPages}`;
+      pager.appendChild(info);
+
+      const prev = document.createElement('button'); prev.textContent='Prev';
+      prev.disabled = page<=1; prev.addEventListener('click', ()=>{page--; render();});
+      pager.appendChild(prev);
+
+      const next = document.createElement('button'); next.textContent='Next';
+      next.disabled = page>=totalPages; next.addEventListener('click', ()=>{page++; render();});
+      pager.appendChild(next);
+    }
+
+    // modal helpers
+    function openModal(record){
+      document.getElementById('modalTitle').textContent = record ? 'Edit Payment' : 'Record Payment';
+      document.getElementById('mMemberId').value = record ? record.id : '';
+      document.getElementById('mName').value = record ? record.name : '';
+      document.getElementById('mAmount').value = record ? record.amount : '';
+      document.getElementById('mDueDate').value = record ? record.due : '';
+      document.getElementById('mNotes').value = record ? record.notes : '';
+      modalBackdrop.style.display = 'flex';
+
+      // store current editing reference
+      modalBackdrop.current = record || null;
+    }
+    function closeModal(){
+      modalBackdrop.style.display = 'none';
+      modalBackdrop.current = null;
+    }
+
+    // save from modal
+    document.getElementById('saveModal').addEventListener('click', ()=>{
+      const id = document.getElementById('mMemberId').value.trim();
+      const name = document.getElementById('mName').value.trim();
+      const amount = Number(document.getElementById('mAmount').value) || 0;
+      const due = document.getElementById('mDueDate').value || '';
+      const notes = document.getElementById('mNotes').value.trim();
+      if(!id || !name){ alert('Member ID and Name required'); return; }
+
+      if(modalBackdrop.current){
+        // edit
+        modalBackdrop.current.id = id;
+        modalBackdrop.current.name = name;
+        modalBackdrop.current.amount = amount;
+        modalBackdrop.current.due = due;
+        modalBackdrop.current.notes = notes;
+      } else {
+        payments.unshift({id,name,amount,due,status: amount>0?'unpaid':'paid',notes});
+      }
+      save(); closeModal(); render();
+    });
+    document.getElementById('cancelModal').addEventListener('click', closeModal);
+
+    document.getElementById('newPayment').addEventListener('click', ()=>openModal(null));
+    document.getElementById('search').addEventListener('input', ()=>{ page = 1; render(); });
+    document.getElementById('filterStatus').addEventListener('change', ()=>{ page = 1; render(); });
+    perPageSelect.addEventListener('change', ()=>{ page = 1; render(); });
+
+    document.getElementById('downloadCsv').addEventListener('click', ()=>{
+      const header = ['Member ID','Name','Amount','Due Date','Status','Notes'];
+      const rows = payments.map(p=>[p.id,p.name,p.amount,p.due,p.status,p.notes||'']);
+      const csv = [header.join(','), ...rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(','))].join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'library_payments.csv'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('clearStorage').addEventListener('click', ()=>{
+      if(confirm('Reset data to initial sample?')){
+        localStorage.removeItem(STORAGE_KEY); load(); render();
+      }
+    });
+
+    // click outside modal to close
+    modalBackdrop.addEventListener('click', (e)=>{ if(e.target===modalBackdrop) closeModal(); });
+
+    // init
+    load(); render();
+  </script>
+</body>
+</html>

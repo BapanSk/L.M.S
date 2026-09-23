@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login - BCET Library</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color:#dfe8df ;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-form {
+      background-color: #dfe8df;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      width: 350px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    input[type="submit"] {
+      width: 100%;
+      padding: 15px;
+      background-color: #0063cc;
+      border: none;
+      color: white;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    input[type="submit"]:hover {
+      background-color: #848ecd;
+    }
+    .error {
+      color: red;
+      font-size: 13px;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    .general-error {
+      text-align: center;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-form">
+    <h2>Admin login</h2>
+    <form onsubmit="login(event)">
+      <div>
+        <input type="text" id="adminId" placeholder="Admin ID">
+        <div id="idError" class="error"></div>
+      </div>
+      <div>
+        <input type="password" id="password" placeholder="Password">
+        <div id="passError" class="error"></div>
+      </div>
+      <input type="submit" value="Login">
+      <div id="generalError" class="error general-error"></div>
+    </form>
+    <a href="forgetpass.html" style="display: block; text-align: center; margin-top: 10px;">Forget Password</a>
+    <a href="Admin Registration Page.html" style="display: block; text-align: center; margin-top: 10px;">Don’t have an account? Sign Up</a>
+  </div>
+
+  <script>
+    function login(event) {
+      event.preventDefault();
+
+      const id = document.getElementById("adminId").value.trim();
+      const pass = document.getElementById("password").value.trim();
+
+      const idError = document.getElementById("idError");
+      const passError = document.getElementById("passError");
+      const generalError = document.getElementById("generalError");
+
+      // clear old errors
+      idError.textContent = "";
+      passError.textContent = "";
+      generalError.textContent = "";
+
+      let valid = true;
+
+      if (id === "" && pass === "") {
+        generalError.textContent = "⚠ Admin ID and Password are required!";
+        valid = false;
+      } else {
+        if (id === "") {
+          idError.textContent = "⚠ Please enter Admin ID";
+          valid = false;
+        }
+        if (pass === "") {
+          passError.textContent = "⚠ Please enter Password";
+          valid = false;
+        }
+      }
+
+      if (valid) {
+        localStorage.setItem("adminId", id);
+        localStorage.setItem("adminPass", pass);
+        window.location.href = "dashboard.html";
+      }
+    }
+  </script>
+</body>
+</html>

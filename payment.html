@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Payment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      width: 400px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #34495e;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    input:focus, select:focus {
+      border-color: #2980b9;
+      outline: none;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #1e6091;
+    }
+    .note {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #7f8c8d;
+      text-align: center;
+    }
+    .payment-details {
+      display: none;
+      margin-top: 10px;
+    }
+    .success-message {
+      display: none;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      color: green;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Library Payment</h2>
+    <form id="paymentForm">
+      <div class="form-group">
+        <label for="studentid">Student ID</label>
+        <input type="text" id="studentid" name="studentid" placeholder="Enter Student ID" required>
+      </div>
+      <div class="form-group">
+        <label for="studentname">Student Name</label>
+        <input type="text" id="studentname" name="studentname" placeholder="Enter Student Name" required>
+      </div>
+      <div class="form-group">
+        <label for="bookid">Book ID</label>
+        <input type="text" id="bookid" name="bookid" placeholder="Enter Book ID" required oninput="setAmount()">
+      </div>
+      <div class="form-group">
+        <label for="amount">Amount (₹)</label>
+        <input type="number" id="amount" name="amount" placeholder="Auto Amount" readonly>
+      </div>
+      <div class="form-group">
+        <label for="method">Payment Method</label>
+        <select id="method" name="method" required onchange="showPaymentFields()">
+          <option value="">--Select Method--</option>
+          <option value="card">Card</option>
+          <option value="upi">UPI</option>
+        </select>
+      </div>
+
+      <!-- Card Details -->
+      <div id="cardFields" class="payment-details">
+        <div class="form-group">
+          <label for="cardnumber">Card Number</label>
+          <input type="text" id="cardnumber" placeholder="Enter Card Number">
+        </div>
+        <div class="form-group">
+          <label for="expiry">Expiry Date</label>
+          <input type="month" id="expiry">
+        </div>
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input type="password" id="cvv" maxlength="3" placeholder="CVV">
+        </div>
+      </div>
+
+      <!-- UPI Details -->
+      <div id="upiFields" class="payment-details">
+        <div class="form-group">
+          <label for="upiid">UPI ID</label>
+          <input type="text" id="upiid" placeholder="example@upi">
+        </div>
+      </div>
+
+      <button type="submit" class="btn">Payment Now</button>
+      <p class="note">All transactions are recorded in the Library Management System.</p>
+    </form>
+
+    <!-- Success Message -->
+    <p id="successMessage" class="success-message">✅ Payment Successful!</p>
+  </div>
+
+  <script>
+    // Example book prices (BookID → Amount)
+    const bookPrices = {
+      "B101": 120,
+      "B102": 200,
+      "B103": 150,
+      "B104": 300,
+      "B105": 250
+    };
+
+    function setAmount() {
+      const bookId = document.getElementById("bookid").value.trim().toUpperCase();
+      const amountField = document.getElementById("amount");
+      if(bookPrices[bookId]) {
+        amountField.value = bookPrices[bookId];
+      } else {
+        amountField.value = "";
+      }
+    }
+
+    function showPaymentFields() {
+      const method = document.getElementById("method").value;
+      document.getElementById("cardFields").style.display = (method === "card") ? "block" : "none";
+      document.getElementById("upiFields").style.display = (method === "upi") ? "block" : "none";
+    }
+
+    // Show success message on submit
+    document.getElementById("paymentForm").addEventListener("submit", function(e) {
+      e.preventDefault(); // prevent page reload
+      document.getElementById("successMessage").style.display = "block";
+    });
+  </script>
+</body>
+</html>

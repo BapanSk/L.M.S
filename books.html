@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library - Add/Remove Books</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      width: 80%;
+      max-width: 900px;
+      background: #fff;
+      margin: 30px;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+      color: #34495e;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    input:focus {
+      border-color: #2980b9;
+      outline: none;
+    }
+    .btn {
+      background: #2980b9;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn:hover {
+      background: #1e6091;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #2980b9;
+      color: white;
+    }
+    .remove-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .remove-btn:hover {
+      background: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📚 Library - Add / Remove Books</h2>
+
+    <!-- Add Book Form -->
+    <form id="bookForm">
+      <div class="form-group">
+        <label for="bookId">Book ID</label>
+        <input type="text" id="bookId" placeholder="Enter Book ID" required>
+      </div>
+      <div class="form-group">
+        <label for="bookName">Book Name</label>
+        <input type="text" id="bookName" placeholder="Enter Book Name" required>
+      </div>
+      <div class="form-group">
+        <label for="author">Author</label>
+        <input type="text" id="author" placeholder="Enter Author Name" required>
+      </div>
+      <div class="form-group">
+        <label for="price">Price (₹)</label>
+        <input type="number" id="price" placeholder="Enter Price" required>
+      </div>
+      <button type="submit" class="btn">Add Book</button>
+    </form>
+
+    <!-- Book List Table -->
+    <table id="bookTable">
+      <thead>
+        <tr>
+          <th>Book ID</th>
+          <th>Book Name</th>
+          <th>Author</th>
+          <th>Price (₹)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Books will appear here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const bookForm = document.getElementById("bookForm");
+    const bookTable = document.getElementById("bookTable").getElementsByTagName("tbody")[0];
+
+    // Add book
+    bookForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const id = document.getElementById("bookId").value.trim();
+      const name = document.getElementById("bookName").value.trim();
+      const author = document.getElementById("author").value.trim();
+      const price = document.getElementById("price").value.trim();
+
+      if (!id || !name || !author || !price) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      // Insert new row
+      const newRow = bookTable.insertRow();
+      newRow.innerHTML = `
+        <td>${id}</td>
+        <td>${name}</td>
+        <td>${author}</td>
+        <td>₹ ${price}</td>
+        <td><button class="remove-btn" onclick="removeBook(this)">Remove</button></td>
+      `;
+
+      // Clear form
+      bookForm.reset();
+    });
+
+    // Remove book
+    function removeBook(button) {
+      const row = button.parentElement.parentElement;
+      row.remove();
+    }
+  </script>
+</body>
+</html>
